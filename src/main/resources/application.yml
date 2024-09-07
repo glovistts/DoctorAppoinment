@@ -1,5 +1,8 @@
 spring:
   application:
-    name: satrin
+    name: Doctor appointment
 server:
   port: 8030
+
+apiPrefix:
+  v1: /api/v1
