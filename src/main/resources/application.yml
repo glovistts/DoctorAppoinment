@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: satrin
+server:
+  port: 8030

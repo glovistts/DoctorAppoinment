@@ -1,4 +1,4 @@
-package com.doctorappointment.domain.model;
+package com.doctorappointment.entites;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Audited
 @Getter
 @Setter
-public abstract class BaseEntity {
+public abstract class Base {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
