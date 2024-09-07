@@ -4,8 +4,8 @@ import lombok.Getter;
 
 @Getter
 public enum Status {
-    ACTIVE_STATUS("ACTIVE_STATUS"),
-    DEACTIVE_STATUS("DEACTIVE_STATUS");
+    OPEN("OPEN"),
+    TAKEN("TAKEN");
 
     private final String status;
 
