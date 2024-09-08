@@ -26,7 +26,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @RunWith(SpringRunner.class)
 @ActiveProfiles("test")
-@Sql(scripts = "classpath:schema.sql")
 public class DoctorAddOpenTimesTest {
 
     @Autowired

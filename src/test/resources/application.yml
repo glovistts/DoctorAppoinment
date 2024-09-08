@@ -1,24 +1,20 @@
-server:
-  port: 8080
-
 spring:
+  application:
+    name: Doctor appointment
   datasource:
-    url: jdbc:h2:mem:testdb
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
-  h2:
-    console:
-      enabled: true
+    url: jdbc:postgresql://130.185.77.235:5437/common
+    username: M0nkdVBMD0hSOGySuJ89UGt9kgb5MvvQEnVpmpxdYToT37gFvE
+    password: aDRvZlT3j1G5CKvWHQUXRwzbSc8Ks37WuwFMNpcLq7LHwkH1dtMHk73xrIq0FrvlGsm9JI4o8FPBqRdp0PHeFmIN7EB1oD7y1WtU
   jpa:
     hibernate:
       ddl-auto: create-drop
-      default_schema: doctor_schema
     show-sql: true
-  sql:
-    init:
-      mode: always
-      schema-locations: classpath:schema.sql
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        default_schema: doctor_schema_test
+server:
+  port: 8030
 
 apiPrefix:
   v1: /api/v1

@@ -12,4 +12,9 @@ public class TakeAppointmentRequestDto {
 
     @NotBlank(message = "Phone number is required")
     private String phoneNumber;
+
+    public TakeAppointmentRequestDto(String name, String phoneNumber) {
+        this.name=name;
+        this.phoneNumber=phoneNumber;
+    }
 }

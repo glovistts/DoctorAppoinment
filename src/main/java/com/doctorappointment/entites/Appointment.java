@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Entity
-@Table(name = "appointment",schema = "doctor_schema")
+@Table(name = "appointment")
 @Audited
 @Getter
 @Setter

@@ -28,7 +28,6 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 @RunWith(SpringRunner.class)
 @ActiveProfiles("test")
-@Sql(scripts = "classpath:schema.sql")
 public class DoctorViewAppointmentsTest {
 
     @Mock

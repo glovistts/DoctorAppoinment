@@ -11,7 +11,7 @@ import org.hibernate.envers.Audited;
 import java.util.Set;
 
 @Entity
-@Table(name = "doctor",schema = "doctor_schema")
+@Table(name = "doctor")
 @Audited
 @Getter
 @Setter
