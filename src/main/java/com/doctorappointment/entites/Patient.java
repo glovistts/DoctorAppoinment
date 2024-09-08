@@ -19,6 +19,15 @@ public class Patient extends Base {
     private String name;
     private String phoneNumber;
 
-    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "patient")
     private Set<Appointment> appointments;
+
+    public Patient(String name, String phoneNumber) {
+        this.name=name;
+        this.phoneNumber=phoneNumber;
+    }
+
+    public Patient() {
+
+    }
 }

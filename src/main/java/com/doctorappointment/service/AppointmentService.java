@@ -2,6 +2,7 @@ package com.doctorappointment.service;
 
 import com.doctorappointment.dtos.AppointmentResponseDto;
 import com.doctorappointment.dtos.OpenTimesRequestDto;
+import com.doctorappointment.dtos.PatientAppointmentResponseDto;
 import com.doctorappointment.dtos.TakeAppointmentRequestDto;
 import com.doctorappointment.entites.Appointment;
 import com.doctorappointment.entites.Doctor;
@@ -9,6 +10,7 @@ import com.doctorappointment.entites.Patient;
 import com.doctorappointment.enums.Status;
 import com.doctorappointment.exeption.AppointmentAlreadyTakenException;
 import com.doctorappointment.exeption.AppointmentNotFoundException;
+import com.doctorappointment.exeption.PatientNotFoundException;
 import com.doctorappointment.mappers.AppointmentMapper;
 import com.doctorappointment.repositories.AppointmentRepository;
 import com.doctorappointment.repositories.DoctorRepository;
@@ -18,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +40,7 @@ public class AppointmentService {
     private AppointmentMapper appointmentMapper;
 
     @Transactional
-    public void addOpenTimes(OpenTimesRequestDto dto) {
+    public List<Appointment> addOpenTimes(OpenTimesRequestDto dto) {
         LocalTime start = dto.getStartDate();
         LocalTime end = dto.getEndDate();
         if (end.isBefore(start)) {
@@ -52,6 +53,7 @@ public class AppointmentService {
         List<Appointment> appointments = appointmentMapper.mapToAppointments(dto, doctor);
 
         appointmentRepository.saveAll(appointments);
+        return appointments;
     }
     public List<AppointmentResponseDto> getDoctorAppointments(Long doctorId) {
         List<Appointment> appointments = appointmentRepository.findByDoctorId(doctorId);
@@ -76,7 +78,7 @@ public class AppointmentService {
 
     @Transactional
     public void deleteOpenAppointment(Long appointmentId) {
-        Optional<Appointment> appointmentOpt = appointmentRepository.findByAppointmentId(appointmentId);
+        Optional<Appointment> appointmentOpt = appointmentRepository.findById(appointmentId);
         if (appointmentOpt.isEmpty()) {
             throw new AppointmentNotFoundException("Appointment not found.");
         }
@@ -107,5 +109,24 @@ public class AppointmentService {
         appointment.setPatient(patient);
         appointment.setStatus(Status.TAKEN);
         appointmentRepository.save(appointment);
+    }
+    public List<PatientAppointmentResponseDto> getAppointmentsByPhoneNumber(String phoneNumber) {
+        Patient patient = patientRepository.findByPhoneNumber(phoneNumber)
+                .orElseThrow(() -> new PatientNotFoundException("No patient found with the provided phone number"));
+        List<Appointment> appointments = appointmentRepository.findByPatient(patient);
+        return appointments.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    private PatientAppointmentResponseDto convertToDto(Appointment appointment) {
+        return new PatientAppointmentResponseDto(
+                appointment.getId(),
+                appointment.getStartTime(),
+                appointment.getEndTime(),
+                appointment.getDoctor().getName(),
+                appointment.getDay(),
+                appointment.getStatus()
+        );
     }
 }

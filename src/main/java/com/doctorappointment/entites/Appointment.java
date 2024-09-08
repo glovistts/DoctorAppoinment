@@ -28,11 +28,11 @@ public class Appointment extends Base {
     @Column(name = "appointment_day")
     private LocalDate day;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "doctor_id")
     private Doctor doctor;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "patient_id")
     private Patient patient;
 }

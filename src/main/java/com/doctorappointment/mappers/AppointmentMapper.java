@@ -40,6 +40,7 @@ public class AppointmentMapper {
         dto.setStartTime(appointment.getStartTime());
         dto.setEndTime(appointment.getEndTime());
         dto.setDay(appointment.getDay());
+        dto.setStatus(appointment.getStatus());
         return dto;
     }
 }

@@ -1,6 +1,7 @@
 package com.doctorappointment.repositories;
 
 import com.doctorappointment.entites.Appointment;
+import com.doctorappointment.entites.Patient;
 import com.doctorappointment.enums.Status;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -13,6 +14,9 @@ import java.util.Optional;
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
     boolean existsByDoctorIdAndDay(Long doctorId, LocalDate day);
     List<Appointment> findByDoctorId(Long doctorId);
-    Optional<Appointment> findByAppointmentId( Long appointmentId);
     List<Appointment> findByDoctorIdAndDayAndPatientIsNull(Long doctorId, LocalDate day);
+    Optional<Appointment> findByIdAndStatus(Long id, Status status);
+    List<Appointment> findByPatient(Patient patient);
+
+
 }

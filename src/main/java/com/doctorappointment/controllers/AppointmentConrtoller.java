@@ -2,6 +2,7 @@ package com.doctorappointment.controllers;
 
 import com.doctorappointment.dtos.AppointmentResponseDto;
 import com.doctorappointment.dtos.OpenTimesRequestDto;
+import com.doctorappointment.dtos.PatientAppointmentResponseDto;
 import com.doctorappointment.dtos.TakeAppointmentRequestDto;
 import com.doctorappointment.service.AppointmentService;
 import jakarta.validation.Valid;
@@ -32,27 +33,28 @@ public class AppointmentConrtoller {
         List<AppointmentResponseDto> openAppointments = appointmentService.getOpenAppointments(doctorId, day);
         return ResponseEntity.ok(openAppointments);
     }
+    @GetMapping("/patient/{phoneNumber}")
+    public ResponseEntity<List<PatientAppointmentResponseDto>> getAppointmentsByPhoneNumber(
+            @PathVariable String phoneNumber) {
+        List<PatientAppointmentResponseDto> appointments = appointmentService.getAppointmentsByPhoneNumber(phoneNumber);
+        return ResponseEntity.ok(appointments);
+    }
     @DeleteMapping("/doctor/delete/{appointmentId}")
     public ResponseEntity<String> deleteOpenAppointment( @PathVariable Long appointmentId) {
         appointmentService.deleteOpenAppointment(appointmentId);
-        return ResponseEntity.ok("Appointment deleted successfully.");
+        return ResponseEntity.ok("نوبت با موفقیت حذف شد.");
     }
     @PostMapping("/open-times")
     public ResponseEntity<String> addOpenTimes(@Valid @RequestBody OpenTimesRequestDto dto) {
-        try {
             appointmentService.addOpenTimes(dto);
             return ResponseEntity.ok("نوبت دهی با موفقیت انجام شد!");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
     }
     @PostMapping("/{appointmentId}/take")
     public ResponseEntity<String> takeAppointment(
             @PathVariable Long appointmentId,
             @Valid @RequestBody TakeAppointmentRequestDto requestDto) {
-
         appointmentService.takeAppointment(appointmentId, requestDto);
-        return ResponseEntity.ok("Appointment successfully taken.");
+        return ResponseEntity.ok("نوبت بیمار با موفقیت ثبت شد.");
     }
 
 }
