@@ -4,7 +4,11 @@ import com.doctorappointment.dtos.AppointmentResponseDto;
 import com.doctorappointment.entites.Appointment;
 import com.doctorappointment.entites.Patient;
 import com.doctorappointment.enums.Status;
+import com.doctorappointment.mappers.AppointmentMapper;
+import com.doctorappointment.mappers.AppointmentResponseDtoMapper;
 import com.doctorappointment.repositories.AppointmentRepository;
+import com.doctorappointment.repositories.DoctorRepository;
+import com.doctorappointment.repositories.PatientRepository;
 import com.doctorappointment.service.AppointmentService;
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,6 +36,15 @@ public class DoctorViewAppointmentsTest {
 
     @Mock
     private AppointmentRepository appointmentRepository;
+    @Mock
+    private DoctorRepository doctorRepository;
+    @Mock
+    private PatientRepository patientRepository;
+    @Mock
+    private AppointmentMapper appointmentMapper;
+    @Mock
+    private AppointmentResponseDtoMapper appointmentResponseDtoMapper;
+
 
     @InjectMocks
     private AppointmentService appointmentService;
@@ -62,7 +75,7 @@ public class DoctorViewAppointmentsTest {
         Appointment appointment1 = new Appointment();
         appointment1.setId(1L);
         appointment1.setStartTime(LocalTime.of(9, 0));
-        appointment1.setEndTime(LocalTime.of(9, 30));
+        appointment1.setEndTime(LocalTime.of(9, 31));
         appointment1.setDay(LocalDate.of(2024, 9, 8));
         appointment1.setStatus(Status.TAKEN);
 

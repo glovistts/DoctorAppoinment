@@ -21,4 +21,13 @@ public class Doctor extends Base {
 
     @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL)
     private Set<Appointment> appointments;
+
+    public Doctor(String name, String specialization) {
+        this.name=name;
+        this.specialization=specialization;
+    }
+
+    public Doctor() {
+
+    }
 }

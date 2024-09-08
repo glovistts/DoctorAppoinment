@@ -7,7 +7,7 @@ spring:
     password: aDRvZlT3j1G5CKvWHQUXRwzbSc8Ks37WuwFMNpcLq7LHwkH1dtMHk73xrIq0FrvlGsm9JI4o8FPBqRdp0PHeFmIN7EB1oD7y1WtU
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:

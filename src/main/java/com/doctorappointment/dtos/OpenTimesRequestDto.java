@@ -27,4 +27,13 @@ public class OpenTimesRequestDto {
     @NotNull(message = "Day cannot be null")
     @Future(message = "Day must be a future date")
     private LocalDate day;
+
+    public OpenTimesRequestDto(LocalTime startTime, LocalTime endTime, long doctorId) {
+        this.startDate=startTime;
+        this.endDate=endTime;
+    }
+
+    public OpenTimesRequestDto() {
+
+    }
 }

@@ -12,16 +12,16 @@ import com.doctorappointment.exeption.AppointmentAlreadyTakenException;
 import com.doctorappointment.exeption.AppointmentNotFoundException;
 import com.doctorappointment.exeption.PatientNotFoundException;
 import com.doctorappointment.mappers.AppointmentMapper;
+import com.doctorappointment.mappers.AppointmentResponseDtoMapper;
 import com.doctorappointment.repositories.AppointmentRepository;
 import com.doctorappointment.repositories.DoctorRepository;
 import com.doctorappointment.repositories.PatientRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.doctorappointment.validator.AppointmentValidator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -29,64 +29,49 @@ import java.util.stream.Collectors;
 
 @Service
 public class AppointmentService {
-
-    @Autowired
     private AppointmentRepository appointmentRepository;
-    @Autowired
     private PatientRepository patientRepository;
-    @Autowired
     private DoctorRepository doctorRepository;
 
-    @Autowired
     private AppointmentMapper appointmentMapper;
+    private AppointmentResponseDtoMapper appointmentResponseDtoMapper;
+    private AppointmentValidator appointmentValidator;
+    AppointmentService(
+       AppointmentRepository appointmentRepository,
+       PatientRepository patientRepository,
+       DoctorRepository doctorRepository,
+       AppointmentMapper appointmentMapper,
+       AppointmentResponseDtoMapper appointmentResponseDtoMapper,
+       AppointmentValidator appointmentValidator
+    ){
+        this.appointmentRepository=appointmentRepository;
+        this.patientRepository=patientRepository;
+        this.doctorRepository=doctorRepository;
+        this.appointmentMapper = appointmentMapper;
+        this.appointmentResponseDtoMapper=appointmentResponseDtoMapper;
+        this.appointmentValidator=appointmentValidator;
+    }
 
     @Transactional
     public List<Appointment> addOpenTimes(OpenTimesRequestDto dto) {
-        LocalTime start = dto.getStartDate();
-        LocalTime end = dto.getEndDate();
-        if (end.isBefore(start)) {
-            throw new IllegalArgumentException("زمان پایان باید بعد از زمان شروع باشد");
-        }
-
+        AppointmentValidator.validateOpenTimes(dto);
         Doctor doctor = doctorRepository.findById(dto.getDoctorId())
                 .orElseThrow(() -> new IllegalArgumentException("دکتر پیدا نشد"));
-
         List<Appointment> appointments = appointmentMapper.mapToAppointments(dto, doctor);
-
         appointmentRepository.saveAll(appointments);
         return appointments;
     }
     public List<AppointmentResponseDto> getDoctorAppointments(Long doctorId) {
         List<Appointment> appointments = appointmentRepository.findByDoctorId(doctorId);
-        List<AppointmentResponseDto> responseList = new ArrayList<>();
-
-        for (Appointment appointment : appointments) {
-            AppointmentResponseDto dto = new AppointmentResponseDto();
-            dto.setId(appointment.getId());
-            dto.setStartTime(appointment.getStartTime());
-            dto.setEndTime(appointment.getEndTime());
-            dto.setDay(appointment.getDay());
-            dto.setStatus(appointment.getStatus());
-            if (appointment.getPatient() != null) {
-                dto.setPatientName(appointment.getPatient().getName());
-                dto.setPatientPhone(appointment.getPatient().getPhoneNumber());
-            }
-
-            responseList.add(dto);
-        }
-        return responseList;
+        return appointmentResponseDtoMapper.toDtoList(appointments);
     }
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public void deleteOpenAppointment(Long appointmentId) {
         Optional<Appointment> appointmentOpt = appointmentRepository.findById(appointmentId);
-        if (appointmentOpt.isEmpty()) {
-            throw new AppointmentNotFoundException("Appointment not found.");
-        }
+        AppointmentValidator.validateAppointmentExistence(appointmentOpt);
         Appointment appointment = appointmentOpt.get();
-        if (appointment.getPatient() != null) {
-            throw new AppointmentAlreadyTakenException("Appointment is already taken by a patient.");
-        }
+        AppointmentValidator.validateAppointmentPatientExistence(appointment);
         appointmentRepository.delete(appointment);
     }
 
@@ -102,32 +87,19 @@ public class AppointmentService {
     public void takeAppointment(Long appointmentId, TakeAppointmentRequestDto requestDto) {
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new AppointmentNotFoundException("Appointment not found"));
-        if (appointment.getStatus() != Status.OPEN) {
-            throw new AppointmentAlreadyTakenException("Appointment is already taken or deleted");
-        }
+        AppointmentValidator.validateAppointmentStatusTaken(appointment);
         Patient patient = patientRepository.findByPhoneNumber(requestDto.getPhoneNumber())
                 .orElse(new Patient(requestDto.getName(), requestDto.getPhoneNumber()));
-        appointment.setPatient(patient);
-        appointment.setStatus(Status.TAKEN);
-        appointmentRepository.save(appointment);
+        appointmentRepository.save(appointmentMapper.patientToAppointment(appointment,patient));
     }
     public List<PatientAppointmentResponseDto> getAppointmentsByPhoneNumber(String phoneNumber) {
         Patient patient = patientRepository.findByPhoneNumber(phoneNumber)
                 .orElseThrow(() -> new PatientNotFoundException("No patient found with the provided phone number"));
         List<Appointment> appointments = appointmentRepository.findByPatient(patient);
         return appointments.stream()
-                .map(this::convertToDto)
+                .map(AppointmentMapper::convertToDto)
                 .collect(Collectors.toList());
     }
 
-    private PatientAppointmentResponseDto convertToDto(Appointment appointment) {
-        return new PatientAppointmentResponseDto(
-                appointment.getId(),
-                appointment.getStartTime(),
-                appointment.getEndTime(),
-                appointment.getDoctor().getName(),
-                appointment.getDay(),
-                appointment.getStatus()
-        );
-    }
+
 }
