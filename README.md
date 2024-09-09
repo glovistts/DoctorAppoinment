@@ -1,6 +1,7 @@
 # Building a Simple Doctor's Appointment Application Using Java Spring
 
 This repository contains the code for a simple doctor's appointment system using Java Spring to manage appointments between doctors and patients. The system allows patients to view and book appointments, while the doctor can manage available slots. Below are the key features, stories, and test cases covered in the project.
+![Doctor's Appointment Spring java](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*TFIICO0Ca5DAHsU3w0TJkQ.png)
 
 ## Overview
 
