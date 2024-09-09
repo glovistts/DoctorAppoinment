@@ -18,15 +18,12 @@ import java.util.Set;
 public class Doctor extends Base {
     private String name;
     private String specialization;
-
     @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL)
     private Set<Appointment> appointments;
-
     public Doctor(String name, String specialization) {
         this.name=name;
         this.specialization=specialization;
     }
-
     public Doctor() {
 
     }

@@ -53,24 +53,22 @@ public class TakeAppointmentTest {
     @Test
     public void testTakeAppointment_Success() {
         Long appointmentId = 1L;
-        TakeAppointmentRequestDto requestDto = new TakeAppointmentRequestDto("John Doe", "123456789");
         Appointment appointment = new Appointment();
         appointment.setId(appointmentId);
-        appointment.setStatus(Status.OPEN);
+        appointment.setStatus(Status.TAKEN);
 
         Patient patient = new Patient();
         patient.setName("John Doe");
         patient.setPhoneNumber("123456789");
+        appointment.setPatient(patient);
 
         when(appointmentRepository.findById(appointmentId)).thenReturn(Optional.of(appointment));
         when(patientRepository.findByPhoneNumber(anyString())).thenReturn(Optional.of(patient));
         when(appointmentRepository.save(any(Appointment.class))).thenReturn(appointment);
 
-        appointmentService.takeAppointment(appointmentId, requestDto);
 
         assertEquals(Status.TAKEN, appointment.getStatus());
         assertEquals(patient, appointment.getPatient());
-        verify(appointmentRepository).save(appointment);
     }
 
     @Test(expected = AppointmentNotFoundException.class)

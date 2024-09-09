@@ -2,6 +2,7 @@ package com.doctorappointment.validator;
 
 import com.doctorappointment.dtos.OpenTimesRequestDto;
 import com.doctorappointment.entites.Appointment;
+import com.doctorappointment.enums.Messages;
 import com.doctorappointment.enums.Status;
 import com.doctorappointment.exeption.AppointmentAlreadyTakenException;
 import com.doctorappointment.exeption.AppointmentNotFoundException;
@@ -20,23 +21,23 @@ public class AppointmentValidator {
 
     public static void validateOpenTimes(OpenTimesRequestDto dto) {
         if (dto.getEndDate().isBefore(dto.getStartDate())) {
-            throw new IllegalArgumentException("زمان پایان باید بعد از زمان شروع باشد");
+            throw new IllegalArgumentException(Messages.END_AFTER_START_TIME);
         }
     }
     public static void validateAppointmentExistence(Optional<Appointment> appointmentOpt){
         if (appointmentOpt.isEmpty()) {
-            throw new AppointmentNotFoundException("Appointment not found.");
+            throw new AppointmentNotFoundException(Messages.APPOINMETN_NOT_FOUND);
         }
     }
     public static void validateAppointmentPatientExistence(Appointment appointment){
         if (appointment.getPatient() != null) {
-            throw new AppointmentAlreadyTakenException("Appointment is already taken by a patient.");
+            throw new AppointmentAlreadyTakenException(Messages.APPOINTMENT_ALREADY_TAKEN);
         }
     }
 
     public static void validateAppointmentStatusTaken(Appointment appointment){
         if (appointment.getStatus() != Status.OPEN) {
-            throw new AppointmentAlreadyTakenException("Appointment is already taken or deleted");
+            throw new AppointmentAlreadyTakenException(Messages.APPOINTMENT_ALREADY_TAKEN_DELETED);
         }
     }
 

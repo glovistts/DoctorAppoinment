@@ -4,6 +4,7 @@ import com.doctorappointment.dtos.AppointmentResponseDto;
 import com.doctorappointment.dtos.OpenTimesRequestDto;
 import com.doctorappointment.dtos.PatientAppointmentResponseDto;
 import com.doctorappointment.dtos.TakeAppointmentRequestDto;
+import com.doctorappointment.enums.Messages;
 import com.doctorappointment.service.AppointmentService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,19 +43,19 @@ public class AppointmentConrtoller {
     @DeleteMapping("/doctor/delete/{appointmentId}")
     public ResponseEntity<String> deleteOpenAppointment( @PathVariable Long appointmentId) {
         appointmentService.deleteOpenAppointment(appointmentId);
-        return ResponseEntity.ok("نوبت با موفقیت حذف شد.");
+        return ResponseEntity.ok(Messages.THE_APPOINMENT_DELETED_SUCCESSFULLY);
     }
     @PostMapping("/open-times")
     public ResponseEntity<String> addOpenTimes(@Valid @RequestBody OpenTimesRequestDto dto) {
             appointmentService.addOpenTimes(dto);
-            return ResponseEntity.ok("نوبت دهی با موفقیت انجام شد!");
+            return ResponseEntity.ok(Messages.APPOINMENT_SUCCESSFULL);
     }
     @PostMapping("/{appointmentId}/take")
     public ResponseEntity<String> takeAppointment(
             @PathVariable Long appointmentId,
             @Valid @RequestBody TakeAppointmentRequestDto requestDto) {
         appointmentService.takeAppointment(appointmentId, requestDto);
-        return ResponseEntity.ok("نوبت بیمار با موفقیت ثبت شد.");
+        return ResponseEntity.ok(Messages.PATIENT_TURN_REGISTER_SUCCESSFULL);
     }
 
 }

@@ -87,7 +87,6 @@ public class AppointmentsByPhoneNumberTest {
     public void testGetAppointmentsByPhoneNumber_PatientNotFound() {
         String phoneNumber = "123456789";
         when(patientRepository.findByPhoneNumber(phoneNumber)).thenReturn(Optional.empty());
-
         appointmentService.getAppointmentsByPhoneNumber(phoneNumber);
     }
 }

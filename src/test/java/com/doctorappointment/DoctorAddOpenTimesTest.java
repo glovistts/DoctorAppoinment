@@ -3,6 +3,7 @@ package com.doctorappointment;
 import com.doctorappointment.dtos.OpenTimesRequestDto;
 import com.doctorappointment.entites.Appointment;
 import com.doctorappointment.entites.Doctor;
+import com.doctorappointment.enums.Messages;
 import com.doctorappointment.repositories.AppointmentRepository;
 import com.doctorappointment.repositories.DoctorRepository;
 import com.doctorappointment.service.AppointmentService;
@@ -50,7 +51,7 @@ public class DoctorAddOpenTimesTest {
             appointmentService.addOpenTimes(requestDto);
         });
 
-        String expectedMessage = "زمان پایان باید بعد از زمان شروع باشد";
+        String expectedMessage = Messages.END_AFTER_START_TIME;
         String actualMessage = exception.getMessage();
 
         assertTrue(actualMessage.contains(expectedMessage));

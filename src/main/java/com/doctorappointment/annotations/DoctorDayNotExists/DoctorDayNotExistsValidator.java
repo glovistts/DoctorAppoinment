@@ -8,13 +8,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class DoctorDayNotExistsValidator implements ConstraintValidator<DoctorDayNotExists, OpenTimesRequestDto> {
-
     private final AppointmentRepository appointmentRepository;
-
     public DoctorDayNotExistsValidator(AppointmentRepository appointmentRepository) {
         this.appointmentRepository = appointmentRepository;
     }
-
     @Override
     public boolean isValid(OpenTimesRequestDto dto, ConstraintValidatorContext context) {
         if (dto.getDoctorId() == null || dto.getDay() == null) {

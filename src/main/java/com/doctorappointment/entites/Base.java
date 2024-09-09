@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Audited
 @Getter
 @Setter
-public abstract class Base {
+public class Base {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,16 +23,16 @@ public abstract class Base {
     @LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
     @Version
     private Long version;
-
+    public Base() {
+        this.version = 0L;  // Initialize version to 0
+    }
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
-
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();

@@ -12,10 +12,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = DoctorExistsValidator.class)
 public @interface DoctorExists {
-
     String message() default "Doctor does not exist";
-
     Class<?>[] groups() default {};
-
     Class<? extends Payload>[] payload() default {};
 }

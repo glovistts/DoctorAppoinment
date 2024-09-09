@@ -2,12 +2,12 @@ spring:
   application:
     name: Doctor appointment
   datasource:
-    url: jdbc:postgresql://130.185.77.235:5437/common
-    username: M0nkdVBMD0hSOGySuJ89UGt9kgb5MvvQEnVpmpxdYToT37gFvE
-    password: aDRvZlT3j1G5CKvWHQUXRwzbSc8Ks37WuwFMNpcLq7LHwkH1dtMHk73xrIq0FrvlGsm9JI4o8FPBqRdp0PHeFmIN7EB1oD7y1WtU
+    url: jdbc:postgresql://host:5437/port
+    username: username
+    password: password
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: true
     properties:
       hibernate:

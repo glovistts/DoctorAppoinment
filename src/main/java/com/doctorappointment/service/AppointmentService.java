@@ -7,6 +7,7 @@ import com.doctorappointment.dtos.TakeAppointmentRequestDto;
 import com.doctorappointment.entites.Appointment;
 import com.doctorappointment.entites.Doctor;
 import com.doctorappointment.entites.Patient;
+import com.doctorappointment.enums.Messages;
 import com.doctorappointment.enums.Status;
 import com.doctorappointment.exeption.AppointmentAlreadyTakenException;
 import com.doctorappointment.exeption.AppointmentNotFoundException;
@@ -56,7 +57,7 @@ public class AppointmentService {
     public List<Appointment> addOpenTimes(OpenTimesRequestDto dto) {
         AppointmentValidator.validateOpenTimes(dto);
         Doctor doctor = doctorRepository.findById(dto.getDoctorId())
-                .orElseThrow(() -> new IllegalArgumentException("دکتر پیدا نشد"));
+                .orElseThrow(() -> new IllegalArgumentException(Messages.DOCTOR_NOT_FOUND));
         List<Appointment> appointments = appointmentMapper.mapToAppointments(dto, doctor);
         appointmentRepository.saveAll(appointments);
         return appointments;
@@ -84,17 +85,17 @@ public class AppointmentService {
     }
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public void takeAppointment(Long appointmentId, TakeAppointmentRequestDto requestDto) {
+    public Appointment takeAppointment(Long appointmentId, TakeAppointmentRequestDto requestDto) {
         Appointment appointment = appointmentRepository.findById(appointmentId)
-                .orElseThrow(() -> new AppointmentNotFoundException("Appointment not found"));
+                .orElseThrow(() -> new AppointmentNotFoundException(Messages.APPOINMETN_NOT_FOUND));
         AppointmentValidator.validateAppointmentStatusTaken(appointment);
         Patient patient = patientRepository.findByPhoneNumber(requestDto.getPhoneNumber())
                 .orElse(new Patient(requestDto.getName(), requestDto.getPhoneNumber()));
-        appointmentRepository.save(appointmentMapper.patientToAppointment(appointment,patient));
+        return appointmentRepository.save(appointmentMapper.patientToAppointment(appointment,patient));
     }
     public List<PatientAppointmentResponseDto> getAppointmentsByPhoneNumber(String phoneNumber) {
         Patient patient = patientRepository.findByPhoneNumber(phoneNumber)
-                .orElseThrow(() -> new PatientNotFoundException("No patient found with the provided phone number"));
+                .orElseThrow(() -> new PatientNotFoundException(Messages.NO_PATIENT_FOUND_FOR_PHONE));
         List<Appointment> appointments = appointmentRepository.findByPatient(patient);
         return appointments.stream()
                 .map(AppointmentMapper::convertToDto)

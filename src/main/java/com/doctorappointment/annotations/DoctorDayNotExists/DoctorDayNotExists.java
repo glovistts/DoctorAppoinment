@@ -12,10 +12,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = DoctorDayNotExistsValidator.class)
 public @interface DoctorDayNotExists {
-
     String message() default "Doctor already has appointments on this day";
-
     Class<?>[] groups() default {};
-
     Class<? extends Payload>[] payload() default {};
 }

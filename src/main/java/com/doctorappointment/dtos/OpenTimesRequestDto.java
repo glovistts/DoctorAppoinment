@@ -2,6 +2,7 @@ package com.doctorappointment.dtos;
 
 import com.doctorappointment.annotations.DoctorDayNotExists.DoctorDayNotExists;
 import com.doctorappointment.annotations.DoctorExists.DoctorExists;
+import com.doctorappointment.enums.Messages;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Future;
@@ -17,21 +18,17 @@ import java.time.LocalTime;
 @Setter
 @DoctorDayNotExists
 public class OpenTimesRequestDto {
-    @NotNull(message = "Doctor ID cannot be null")
+    @NotNull(message = Messages.DOCTOR_ID_CANNOT_BE_NULL)
     @DoctorExists
     private Long doctorId;
     @Schema(type = "string", pattern = "HH:mm:ss", example = "08:30:00")
     private LocalTime startDate;
     @Schema(type = "string", pattern = "HH:mm:ss", example = "19:30:00")
     private LocalTime endDate;
-    @NotNull(message = "Day cannot be null")
-    @Future(message = "Day must be a future date")
+    @NotNull(message = Messages.DAY_CANNOT_BE_NULL)
+    @Future(message = Messages.DAY_MUST_BE_IN_FUTURE)
     private LocalDate day;
 
-    public OpenTimesRequestDto(LocalTime startTime, LocalTime endTime, long doctorId) {
-        this.startDate=startTime;
-        this.endDate=endTime;
-    }
 
     public OpenTimesRequestDto() {
 

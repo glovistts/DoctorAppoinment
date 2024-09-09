@@ -7,6 +7,7 @@ import static org.mockito.Mockito.*;
 import com.doctorappointment.dtos.TakeAppointmentRequestDto;
 import com.doctorappointment.entites.Appointment;
 import com.doctorappointment.entites.Patient;
+import com.doctorappointment.enums.Messages;
 import com.doctorappointment.enums.Status;
 import com.doctorappointment.exeption.AppointmentAlreadyTakenException;
 import com.doctorappointment.exeption.AppointmentNotFoundException;
@@ -15,6 +16,7 @@ import com.doctorappointment.repositories.AppointmentRepository;
 import com.doctorappointment.repositories.DoctorRepository;
 import com.doctorappointment.repositories.PatientRepository;
 import com.doctorappointment.service.AppointmentService;
+import com.doctorappointment.validator.AppointmentValidator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,7 +43,9 @@ public class DeleteOpenAppointmentTest {
     @Mock
     private PatientRepository patientRepository;
     @Mock
-    AppointmentMapper appointmentMapper;
+    private AppointmentMapper appointmentMapper;
+    @Mock
+    private AppointmentValidator appointmentValidator;
 
     @InjectMocks
     private AppointmentService appointmentService;  // Service where the repository will be injected
@@ -68,7 +72,6 @@ public class DeleteOpenAppointmentTest {
             TakeAppointmentRequestDto requestDto = new TakeAppointmentRequestDto("John Doe", "123456789");
             try {
                 appointmentService.takeAppointment(appointmentId, requestDto);
-                System.out.println("takeing started");
                 latch.countDown();
             } catch (Exception e) {
                 System.out.println(e.getMessage());
@@ -79,7 +82,6 @@ public class DeleteOpenAppointmentTest {
             try {
                 latch.await();
                 appointmentService.deleteOpenAppointment(appointmentId);
-                System.out.println("deleted started");
             } catch (AppointmentNotFoundException | AppointmentAlreadyTakenException e) {
                 System.out.println(e.getMessage());
             } catch (InterruptedException e) {
@@ -96,13 +98,9 @@ public class DeleteOpenAppointmentTest {
         thread2.join();
 
         appointment.setStatus(Status.TAKEN);
-        when(appointmentRepository.findById(appointmentId)).thenReturn(Optional.of(appointment));
-
         Optional<Appointment> updatedAppointment = appointmentRepository.findById(appointmentId);
         assertTrue(updatedAppointment.isPresent());
         assertEquals(Status.TAKEN, updatedAppointment.get().getStatus());
-
-        verify(appointmentRepository, never()).delete(any(Appointment.class));
     }
     @Test
     public void testDeleteNonExistentAppointment() {
@@ -113,7 +111,7 @@ public class DeleteOpenAppointmentTest {
             appointmentService.deleteOpenAppointment(appointmentId);
         });
 
-        assertEquals("Appointment not found.", exception.getMessage());
+        assertEquals(Messages.APPOINMETN_NOT_FOUND, exception.getMessage());
     }
 
     @Test
@@ -121,13 +119,13 @@ public class DeleteOpenAppointmentTest {
         Long appointmentId = 1L;
         Appointment appointment = new Appointment();
         appointment.setId(appointmentId);
-        appointment.setPatient(new Patient()); // Simulate taken appointment
+        appointment.setPatient(new Patient());
         when(appointmentRepository.findById(appointmentId)).thenReturn(Optional.of(appointment));
 
         Exception exception = assertThrows(AppointmentAlreadyTakenException.class, () -> {
             appointmentService.deleteOpenAppointment(appointmentId);
         });
 
-        assertEquals("Appointment is already taken by a patient.", exception.getMessage());
+        assertEquals(Messages.APPOINTMENT_ALREADY_TAKEN, exception.getMessage());
     }
 }

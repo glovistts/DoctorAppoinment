@@ -2,6 +2,7 @@ package com.doctorappointment;
 
 import com.doctorappointment.dtos.AppointmentResponseDto;
 import com.doctorappointment.entites.Appointment;
+import com.doctorappointment.entites.Doctor;
 import com.doctorappointment.entites.Patient;
 import com.doctorappointment.enums.Status;
 import com.doctorappointment.mappers.AppointmentMapper;
@@ -10,12 +11,14 @@ import com.doctorappointment.repositories.AppointmentRepository;
 import com.doctorappointment.repositories.DoctorRepository;
 import com.doctorappointment.repositories.PatientRepository;
 import com.doctorappointment.service.AppointmentService;
+import com.doctorappointment.validator.AppointmentValidator;
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
@@ -27,76 +30,82 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
+@SpringBootTest // This loads the entire application context
 @RunWith(SpringRunner.class)
 @ActiveProfiles("test")
 public class DoctorViewAppointmentsTest {
 
-    @Mock
+    @Autowired
     private AppointmentRepository appointmentRepository;
-    @Mock
+
+    @Autowired
     private DoctorRepository doctorRepository;
-    @Mock
+
+    @Autowired
     private PatientRepository patientRepository;
-    @Mock
+
+    @Autowired
     private AppointmentMapper appointmentMapper;
-    @Mock
+
+    @Autowired
     private AppointmentResponseDtoMapper appointmentResponseDtoMapper;
 
+    @Autowired
+    private AppointmentValidator appointmentValidator;
 
-    @InjectMocks
+    @Autowired
     private AppointmentService appointmentService;
 
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.openMocks(this);
+        // Clean the repository if needed, to avoid test data persistence between tests
+        appointmentRepository.deleteAll();
+        doctorRepository.deleteAll();
+        patientRepository.deleteAll();
     }
 
-    @Test
-    public void testGetDoctorAppointments_NoAppointments() {
-        // Given
-        Long doctorId = 1L;
-        when(appointmentRepository.findByDoctorId(doctorId)).thenReturn(new ArrayList<>());
-
-        // When
-        List<AppointmentResponseDto> result = appointmentService.getDoctorAppointments(doctorId);
-
-        // Then
-        assertEquals(0, result.size(), "The result list should be empty.");
-    }
 
     @Test
     public void testGetDoctorAppointments_WithAppointments() {
+
         Long doctorId = 1L;
-        List<Appointment> appointments = new ArrayList<>();
+        List<AppointmentResponseDto> resultEmpty = appointmentService.getDoctorAppointments(doctorId);
+        assertEquals(0, resultEmpty.size(), "The result list should be empty.");
+
+        Doctor doctor = new Doctor();
+        doctor.setId(doctorId);
+        doctor.setName("mr john");
+        doctor.setSpecialization("something");
+        doctorRepository.save(doctor); // Save doctor into the repository
 
         Appointment appointment1 = new Appointment();
-        appointment1.setId(1L);
         appointment1.setStartTime(LocalTime.of(9, 0));
-        appointment1.setEndTime(LocalTime.of(9, 31));
-        appointment1.setDay(LocalDate.of(2024, 9, 8));
+        appointment1.setEndTime(LocalTime.of(9, 30));
+        appointment1.setDay(LocalDate.of(2024, 12, 8));
         appointment1.setStatus(Status.TAKEN);
+        appointment1.setDoctor(doctor); // Link the appointment to the saved doctor
 
         Patient patient = new Patient();
         patient.setName("ali");
         patient.setPhoneNumber("1234567890");
+        patient=patientRepository.save(patient);
+
         appointment1.setPatient(patient);
 
-        appointments.add(appointment1);
+        appointment1=appointmentRepository.save(appointment1);
 
-        when(appointmentRepository.findByDoctorId(doctorId)).thenReturn(appointments);
         List<AppointmentResponseDto> result = appointmentService.getDoctorAppointments(doctorId);
-
         assertEquals(1, result.size(), "The result list should contain one appointment.");
         AppointmentResponseDto dto = result.get(0);
-        assertEquals(1L, dto.getId());
-        assertEquals(LocalTime.of(9, 0), dto.getStartTime());
-        assertEquals(LocalTime.of(9, 30), dto.getEndTime());
-        assertEquals(LocalDate.of(2024, 9, 8), dto.getDay());
-        assertEquals(Status.TAKEN, dto.getStatus());
-        assertEquals("ali", dto.getPatientName());
-        assertEquals("1234567890", dto.getPatientPhone());
+        assertEquals(appointment1.getId(), dto.getId());
+        assertEquals(appointment1.getStartTime(), dto.getStartTime());
+        assertEquals(appointment1.getEndTime(), dto.getEndTime());
+        assertEquals(appointment1.getDay(), dto.getDay());
+        assertEquals(patient.getName(), dto.getPatientName());
+        assertEquals(patient.getPhoneNumber(), dto.getPatientPhone());
     }
 }

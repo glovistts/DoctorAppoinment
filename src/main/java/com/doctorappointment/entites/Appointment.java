@@ -19,6 +19,7 @@ import java.time.LocalTime;
 public class Appointment extends Base {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
     private LocalTime startTime;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
     private LocalTime endTime;
 
